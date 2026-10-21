@@ -15,14 +15,26 @@ function App() {
         {
           index: true,
           element: <DashboardPage />,
+          handle: {
+            title: "Дeшборд",
+            description: "Обзор реестра граждан",
+          },
         },
         {
           path: "/citizens",
           element: <CitizensPage />,
+          handle: {
+            title: "Реестр граждан",
+            description: "Просмотр и учёт граждан",
+          },
         },
         {
           path: "/citizens/:id",
           element: <CitizenDetails />,
+          handle: {
+            title: "Данные гражданина",
+            description: "Основная информация о гражданине",
+          },
         },
         {
           path: "*",

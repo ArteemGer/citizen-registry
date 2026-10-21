@@ -1,11 +1,18 @@
 import { useState } from "react";
 import type { MenuProps } from "antd";
-import { Layout, Menu } from "antd";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Layout } from "antd";
+import { Outlet, useLocation, useMatches, useNavigate } from "react-router";
 import { LayoutDashboard, Users } from "lucide-react";
+import AppHeader from "./AppHeader";
+import SideBar from "./Sidebar";
 const { Header, Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>["items"][number];
+
+type PageHandle = {
+  title: string;
+  description: string;
+};
 
 const items: MenuItem[] = [
   {
@@ -25,6 +32,18 @@ const MainLayout = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const matches = useMatches();
+
+  const currentMatch = [...matches].reverse().find((match) => {
+    const handle = match.handle as Partial<PageHandle> | undefined;
+
+    return (
+      typeof handle?.title === "string" &&
+      typeof handle?.description === "string"
+    );
+  });
+
+  const pageInfo = currentMatch?.handle as PageHandle | undefined;
 
   const onClick: MenuProps["onClick"] = (item) => {
     navigate(item.key);
@@ -42,10 +61,10 @@ const MainLayout = () => {
           borderBottom: "1px solid #e2e8f0",
         }}
       >
-        <div style={{ fontSize: 18, fontWeight: 600 }}>Реестр граждан</div>
+        <AppHeader />
       </Header>
 
-      <Layout>
+      <Layout style={{ flex: 1, minHeight: 0 }}>
         <Sider
           theme="light"
           collapsible
@@ -55,28 +74,26 @@ const MainLayout = () => {
             borderRight: "1px solid #e2e8f0",
           }}
         >
-          <div className="demo-logo-vertical" />
-          <Menu
-            theme="light"
-            selectedKeys={[
-              location.pathname.startsWith("/citizens") ? "/citizens" : "/",
-            ]}
-            mode="inline"
-            items={items}
-            onClick={onClick}
-            style={{
-              borderInlineEnd: 0,
-              paddingTop: 12,
-            }}
-          />
+          <SideBar items={items} onClick={onClick} location={location} />
         </Sider>
         <Content
           style={{
+            flex: 1,
             minWidth: 0,
             padding: 24,
             background: "#f5f7fb",
           }}
         >
+          {pageInfo && (
+            <div style={{ marginBottom: 20 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 600 }}>
+                {pageInfo.title}
+              </h1>
+
+              <p style={{ color: "#64748b" }}>{pageInfo.description}</p>
+            </div>
+          )}
+
           <Outlet />
         </Content>
       </Layout>
