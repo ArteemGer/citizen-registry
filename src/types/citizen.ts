@@ -15,8 +15,8 @@ export interface Citizen {
 export interface Passport {
   series: string;
   number: string;
-  issuedAt?: string;
-  issuedBy?: string;
+  issuedAt: string;
+  issuedBy: string;
 }
 
 export interface Address {
