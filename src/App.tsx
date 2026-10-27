@@ -16,7 +16,7 @@ function App() {
           index: true,
           element: <DashboardPage />,
           handle: {
-            title: "Дeшборд",
+            title: "Дешборд",
             description: "Обзор реестра граждан",
           },
         },
