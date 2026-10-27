@@ -1,82 +1,41 @@
-import { Input, Table } from "antd";
-import { citizensData } from "../data/citizens";
-import type { Citizen } from "../types/citizen";
-import type { TableColumnsType } from "antd";
-import { useState } from "react";
 import { useNavigate } from "react-router";
-
-const { Search } = Input;
+import { useCitizensStore } from "../store/citizensStore";
+import { useCitizenFilters } from "../hooks/useCitizenFilters";
+import { useFilteredCitizens } from "../hooks/useFilteredCitizens";
+import CitizensFilters from "../components/CitizensPageComponents/CitizensFilters";
+import CitizensTable from "../components/CitizensPageComponents/CitizensTable";
 
 const CitizensPage = () => {
   const navigate = useNavigate();
-  const columns: TableColumnsType<Citizen> = [
-    {
-      title: "ФИО",
-      dataIndex: ["lastName", "firstName", "middleName"],
-      key: "fio",
-      render: (_, record) =>
-        `${record.lastName} ${record.firstName} ${record.middleName ?? ""}`.trim(),
-    },
-    {
-      title: "Дата рождения",
-      dataIndex: "birthDate",
-      key: "birthDate",
-      sorter: (a, b) =>
-        new Date(a.birthDate).getTime() - new Date(b.birthDate).getTime(),
-    },
-    {
-      title: "Пол",
-      dataIndex: "gender",
-      key: "gender",
-      render: (_, record) => (record.gender === "male" ? "Мужской" : "Женский"),
-    },
-    {
-      title: "Город",
-      dataIndex: ["address", "city"],
-      key: "city",
-    },
-    {
-      title: "Паспорт",
-      key: "passport",
-      render: (_, record) =>
-        `${record.passport.series} ${record.passport.number}`,
-    },
-  ];
-
-  const [searchText, setSearchText] = useState("");
-
-  const filteredCitizens = citizensData.filter((citizen) => {
-    const query = searchText.trim().toLowerCase();
-
-    const fullName =
-      `${citizen.lastName} ${citizen.firstName} ${citizen.middleName ?? ""}`
-        .trim()
-        .toLowerCase();
-
-    const city = citizen.address.city.trim().toLowerCase();
-
-    return fullName.includes(query) || city.includes(query);
-  });
+  const citizens = useCitizensStore((state) => state.citizens);
+  const filters = useCitizenFilters();
+  const { filteredCitizens, cityOptions } = useFilteredCitizens(citizens, filters);
 
   return (
-    <div style={{ width: "100%" }}>
-      <Search
-        placeholder="Поиск по ФИО или городу"
-        allowClear
-        style={{ width: "100%", margin: "10px 0" }}
-        size="large"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-      ></Search>
-      <Table
-        rowHoverable
-        rowClassName={() => "cursor-pointer"}
-        onRow={(record) => ({
-          onClick: () => navigate(`/citizens/${record.id}`),
-        })}
-        rowKey="id"
-        columns={columns}
-        dataSource={filteredCitizens}
+    <div className="w-full">
+      <CitizensFilters
+        searchInput={filters.searchInput}
+        gender={filters.gender}
+        city={filters.city}
+        dateFrom={filters.dateFrom}
+        dateTo={filters.dateTo}
+        cityOptions={cityOptions}
+        filteredCount={filteredCitizens.length}
+        totalCount={citizens.length}
+        onSearchChange={filters.setSearchInput}
+        onGenderChange={(gender) => filters.updateParams({ gender })}
+        onCityChange={(city) => filters.updateParams({ city })}
+        onBirthRangeChange={(dateFrom, dateTo) =>
+          filters.updateParams({ dateFrom, dateTo })
+        }
+        onReset={filters.resetFilters}
+      />
+      <CitizensTable
+        citizens={filteredCitizens}
+        currentPage={filters.currentPage}
+        pageSize={filters.pageSize}
+        onPageChange={filters.changePage}
+        onOpenCitizen={(id) => navigate(`/citizens/${id}`)}
       />
     </div>
   );

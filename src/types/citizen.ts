@@ -1,9 +1,15 @@
+import type { Dayjs } from "dayjs";
+
 export interface Citizen {
   id: string;
   firstName: string;
   lastName: string;
-  middleName: string | null;
+  middleName?: string | null;
   birthDate: string;
+  citizenship?: string | null;
+  maritalStatus?: "single" | "married" | "divorced" | "widowed" | null;
+  phone?: string | null;
+  email?: string | null;
   gender: "male" | "female";
   passport: Passport;
   address: Address;
@@ -36,13 +42,47 @@ export interface FamilyMember {
 }
 
 export interface Education {
+  id: string;
   institution: string;
   specialty: string;
   graduationYear: number;
 }
 
 export interface Employment {
+  id: string;
   organization: string;
   position: string;
   startDate: string;
 }
+
+export type CitizenFormValues = {
+  firstName: string;
+  lastName: string;
+  middleName?: string | null;
+  birthDate: Dayjs;
+  gender: "male" | "female";
+  citizenship?: string | null;
+  maritalStatus?: "single" | "married" | "divorced" | "widowed" | null;
+  phone?: string | null;
+  email?: string | null;
+  passport: {
+    series: string;
+    number: string;
+    issuedBy: string;
+    issuedAt: Dayjs;
+  };
+  address: Address;
+  family: {
+    id: string;
+    fullName: string;
+    relationship: string;
+    birthDate: Dayjs;
+  }[];
+  education: Education[];
+  employment: {
+    id: string;
+    organization: string;
+    position: string;
+    startDate: Dayjs;
+  }[];
+};

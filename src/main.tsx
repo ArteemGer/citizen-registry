@@ -19,7 +19,8 @@ createRoot(document.getElementById("root")!).render(
           borderRadius: 8,
         },
       }}
-    ></ConfigProvider>
-    <App />
+    >
+      <App />
+    </ConfigProvider>
   </StrictMode>,
 );

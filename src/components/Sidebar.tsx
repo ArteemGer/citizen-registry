@@ -1,11 +1,12 @@
 import { Menu, type MenuProps } from "antd";
+import type { Location } from "react-router";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
 interface SideBarProps {
   items: MenuItem[];
   onClick: MenuProps["onClick"];
-  location: any;
+  location: Location;
 }
 
 const Sidebar = ({ items, onClick, location }: SideBarProps) => {
